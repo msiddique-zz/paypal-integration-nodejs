@@ -26,7 +26,7 @@ app.post('/notifications', (req, res) => {
 app.post('/pay', (req, res) => {
 
     var isoDate = new Date();
-    isoDate.setSeconds(isoDate.getSeconds() + 4);
+    isoDate.setSeconds(isoDate.getSeconds() + 59);
     isoDate.toISOString().slice(0, 19) + 'Z';
 
     var billingPlanAttributes = {

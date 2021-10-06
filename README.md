@@ -14,7 +14,7 @@ Make two accounts. One of 'Personal' type and one of 'Business' type.<br /><br /
 
 ## 3- Create Developer App 
 Go to 'My Apps and Credentials' tab located in dashboard panel on left side.<br />
-Click on 'Create App' and fill up the form to create app<br />
+Click on 'Create App' and fill up the forms to create app<br />
 
 ## 4- Get App's credentials
  Copy 'Client ID' & 'Secret' of your app<br /><br />
@@ -34,7 +34,7 @@ ngrok http 3000
 ```
 
 ## 7- Hook the developer App
-Copy the 'https' Forwarding Link from ngrok shell <br /><br />
+Copy the 'https' Forwarding Link from ngrok shell <br />
 Now go to developer app which you created on Paypal<br />
 In 'Sanbox Webhooks' section, click on 'Add Webhook' button<br />
 Paste ngrok's URL in 'Webhook URL' field.<br />
@@ -44,14 +44,15 @@ Click on 'Save' button<br /><br />
 
 
 ## 8- Run the code
-Now go to editor's terminal and run this code<br/><br/>
+Now go to editor's terminal and run these code lines one by one<br/><br/>
 
 ```
-nodemon app.js
+npm install
+node app.js
 ```
 
 ## 9- Open into browser
 Open a browser and go to `http://localhost:3000/`.<br />
 You can now buy an item and subscribe too.<br />
-Click on 'Buy' or 'Subscribe' button and it make the payment via Paypal.<br />
-It will be done . Yayyyyyy<br />
+Click on 'Buy' or 'Subscribe' button and login with 'personal' type sandbox account.<br />
+It will make payment with Paypal . Yayyyyyy<br />
