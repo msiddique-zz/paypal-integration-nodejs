@@ -2,6 +2,8 @@ const express = require('express')
 const bodyParser = require("body-parser")
 const paypal = require('paypal-rest-sdk')
 const ejs = require('ejs')
+const db = require('./config/db.config');
+const payments = db.payments
 var url = require('url');
 require('./configurations/config')
 require('dotenv').config()
@@ -20,6 +22,44 @@ app.post('/', (req, res) => {
 
 app.post('/notifications', (req, res) => {
     console.log('====req from paypal=====', req.body)
+    if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
+        // payments.find({ where: { Tid: req.body.resource.billing_agreement_id } })
+        //     .on('success', function (payment) {
+        //         // Check if record exists in db
+        //         if (payment) {
+        //             payment.update({
+        //                 status: 'Successful'
+        //             })
+        //                 .success(function () { })
+        //         }
+        //     })
+
+
+        payments.findOne({ where: { Tid: req.body.resource.billing_agreement_id } })
+            .then(record => {
+
+                if (!record) {
+                    throw new Error('No record found')
+                }
+
+                console.log(`retrieved record ${JSON.stringify(record, null, 2)}`)
+
+                let values = {
+                    status: 'successful'
+                }
+
+                record.update(values).then(updatedRecord => {
+                    console.log(`updated record ${JSON.stringify(updatedRecord, null, 2)}`)
+                    // login into your DB and confirm update
+                })
+
+            })
+            .catch((error) => {
+                // do seomthing with the error
+                throw new Error(error)
+            })
+
+    }
     res.status(200).send(); //very important step
 })
 
@@ -164,6 +204,7 @@ app.post('/pay', (req, res) => {
                                     var approval_url = billingAgreement.links[index].href;
                                     console.log("For approving subscription via Paypal, first redirect user to");
                                     console.log(approval_url);
+
                                     res.redirect(approval_url)
 
 
@@ -187,14 +228,22 @@ app.get('/successPlan', (req, res) => {
     console.log('------token-------', paymentToken)
     // See billing_agreements/execute.js to see example for executing agreement 
     // after you have payment token
-    paypal.billingAgreement.execute(paymentToken, {}, function (error, billingAgreement) {
+    paypal.billingAgreement.execute(paymentToken, {}, async function (error, billingAgreement) {
         if (error) {
             console.log(error);
             throw error;
         } else {
             console.log("Billing Agreement Execute Response");
-            console.log('-----===============', billingAgreement.links)
+            const payment = {
+                userName: billingAgreement.payer.payer_info.first_name,
+                price: 25,
+                status: 'pending',
+                Tid: billingAgreement.id
+            }
+            //      console.log('=====================first name',billingAgreement.first_name)
+            // payment.userName = billingAgreement.first_name
 
+            await payments.create(payment)
             console.log(JSON.stringify(billingAgreement));
             res.redirect('/successful')
         }
@@ -238,6 +287,7 @@ app.post('/pay', (req, res) => {
 
             for (let i = 0; i < payment.links.length; i++) {
                 if (payment.links[i].rel === 'approval_url') {
+
                     res.redirect(payment.links[i].href)
                 }
             }

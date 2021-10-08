@@ -22,10 +22,17 @@ Click on 'Create App' and fill up the forms to create app<br />
 ## 5- Clone github repository 
 Clone this repository and open code in editor<br />
 First rename '.env-sample' file to '.env'<br />
-Now paste your 'Client ID' and 'Secret' in this file<br /><br />
+Now paste your 'Client ID' and 'Secret' in this file<br />
+Also paste your mysql database credentials in this file<br /><br />
 
+## 6 - Run the migrations
+Run this command to migrate database
 
-## 6- Download ngrok
+```
+npx sequelize-cli db:migrate
+```
+
+## 7- Download ngrok
 Go to `https://ngrok.com/download` and downlaod ngrok in your local storage<br />
 After downloading ,open the ngrok.exe and execute this command<br /><br />
 
@@ -33,7 +40,7 @@ After downloading ,open the ngrok.exe and execute this command<br /><br />
 ngrok http 3000
 ```
 
-## 7- Hook the developer App
+## 8- Hook the developer App
 Copy the 'https' Forwarding Link from ngrok shell <br />
 Now go to developer app which you created on Paypal<br />
 In 'Sanbox Webhooks' section, click on 'Add Webhook' button<br />
@@ -41,9 +48,7 @@ Paste ngrok's URL in 'Webhook URL' field.<br />
 Choose "Billing Plan Created", "Billing Plan Updated", "Billing Subscription Created" , "Payment Sale Created"<br />
 Click on 'Save' button<br /><br />
 
-
-
-## 8- Run the code
+## 9- Run the code
 Now go to editor's terminal and run these code lines one by one<br/><br/>
 
 ```
@@ -51,7 +56,7 @@ npm install
 node app.js
 ```
 
-## 9- Open into browser
+## 10- Open into browser
 Open a browser and go to `http://localhost:3000/`.<br />
 You can now buy an item and subscribe too.<br />
 Click on 'Buy' or 'Subscribe' button and login with 'personal' type sandbox account.<br />
