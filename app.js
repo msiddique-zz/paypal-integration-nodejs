@@ -23,47 +23,68 @@ app.post('/', (req, res) => {
 app.post('/notifications', (req, res) => {
     console.log('====req from paypal=====', req.body)
     if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
-        // payments.find({ where: { Tid: req.body.resource.billing_agreement_id } })
-        //     .on('success', function (payment) {
-        //         // Check if record exists in db
-        //         if (payment) {
-        //             payment.update({
-        //                 status: 'Successful'
-        //             })
-        //                 .success(function () { })
-        //         }
-        //     })
 
+        if (!req.body.resource.billing_agreement_id) {
 
-        payments.findOne({ where: { Tid: req.body.resource.billing_agreement_id } })
-            .then(record => {
+            payments.findOne({ where: { Tid: req.body.resource.parent_payment } })
+                .then(record => {
 
-                if (!record) {
-                    throw new Error('No record found')
-                }
+                    if (!record) {
+                        throw new Error('No record found')
+                    }
 
-                console.log(`retrieved record ${JSON.stringify(record, null, 2)}`)
+                    console.log(`retrieved record ${JSON.stringify(record, null, 2)}`)
 
-                let values = {
-                    status: 'successful'
-                }
+                    let values = {
+                        status: 'successful'
+                    }
 
-                record.update(values).then(updatedRecord => {
-                    console.log(`updated record ${JSON.stringify(updatedRecord, null, 2)}`)
-                    // login into your DB and confirm update
+                    record.update(values).then(updatedRecord => {
+                        console.log(`updated record ${JSON.stringify(updatedRecord, null, 2)}`)
+                        // login into your DB and confirm update
+                    })
+
+                })
+                .catch((error) => {
+                    // do seomthing with the error
+                    throw new Error(error)
                 })
 
-            })
-            .catch((error) => {
-                // do seomthing with the error
-                throw new Error(error)
-            })
+
+        } else {
+
+            payments.findOne({ where: { Tid: req.body.resource.billing_agreement_id } })
+                .then(record => {
+
+                    if (!record) {
+                        throw new Error('No record found')
+                    }
+
+                    console.log(`retrieved record ${JSON.stringify(record, null, 2)}`)
+
+                    let values = {
+                        status: 'successful'
+                    }
+
+                    record.update(values).then(updatedRecord => {
+                        console.log(`updated record ${JSON.stringify(updatedRecord, null, 2)}`)
+                        // login into your DB and confirm update
+                    })
+
+                })
+                .catch((error) => {
+                    // do seomthing with the error
+                    throw new Error(error)
+                })
+
+        }
 
     }
+
     res.status(200).send(); //very important step
 })
 
-app.post('/pay', (req, res) => {
+app.post('/subscribe', (req, res) => {
 
     var isoDate = new Date();
     isoDate.setSeconds(isoDate.getSeconds() + 59);
@@ -240,8 +261,6 @@ app.get('/successPlan', (req, res) => {
                 status: 'pending',
                 Tid: billingAgreement.id
             }
-            //      console.log('=====================first name',billingAgreement.first_name)
-            // payment.userName = billingAgreement.first_name
 
             await payments.create(payment)
             console.log(JSON.stringify(billingAgreement));
@@ -310,13 +329,24 @@ app.get('/success', (req, res) => {
         }]
     };
 
-    paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+    paypal.payment.execute(paymentId, execute_payment_json, async function (error, payment) {
         if (error) {
             console.log(error.response);
             throw error;
         } else {
-            console.log(JSON.stringify(payment.payer));
-            res.send(payment.payer)
+
+
+            const payment_ = {
+                userName: payment.payer.payer_info.first_name,
+                price: 500,
+                status: 'pending',
+                Tid: payment.id
+            }
+
+            await payments.create(payment_)
+
+            console.log(JSON.stringify(payment));
+            res.send(payment)
         }
     });
 
